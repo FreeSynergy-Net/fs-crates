@@ -2,7 +2,7 @@
 
 Git index registry of FreeSynergy in the cargo registry format. It lets the repos of FreeSynergy depend on each other by version range (`fs-types = { version = "~0.0.N", registry = "freesynergy" }`) instead of re-tagging every consumer on each release.
 
-Developed with the support of AI tools (Claude) and reviewed by humans. Mit Unterstuetzung von KI-Werkzeugen (Claude) entwickelt, von Menschen geprueft.
+Written with AI tools (Claude) and reviewed by a second AI model; a human reads and merges this pull request. Mit KI-Werkzeugen (Claude) geschrieben, von einem zweiten KI-Modell geprüft; ein Mensch liest und merged diesen Pull Request.
 
 ## What is here
 - `config.json`: the registry configuration (`dl` points to `raw.githubusercontent.com`; no `api`, because nobody runs `cargo publish` against this registry).
@@ -10,7 +10,7 @@ Developed with the support of AI tools (Claude) and reviewed by humans. Mit Unte
 - `crates/<crate>/<crate>-<version>.crate`: the packaged crates (also created by the workflow).
 - `allowed-sources.txt`: which repos may put crates in (first line: `FreeSynergy-Net/fs-types`, first version 0.0.7, packages `fs-types fs-conformance fs-records`).
 - `.github/workflows/index.yml`: the PULL workflow, every 15 minutes and by hand (`Run workflow`). It reads the allow list, takes new annotated release tags, packages, checks (semver gate against the newest version in this registry) and enters them. Nothing is written by hand. The pin of fs-release is a full commit SHA, set by hand.
-- `.github/CODEOWNERS`: allow list, workflow and `config.json` belong to the team `registry-owners`.
+- `.github/CODEOWNERS`: allow list, workflow and `config.json` belong to `@LordKalEl` (the owner account). A team is created only when there are further maintainers.
 
 Details, test evidence and the click list: `docs/crate-index.md` in `FreeSynergy-Net/fs-release` (ADR 0093 in `FreeSynergy-Net/fs-documentation`).
 
@@ -32,4 +32,4 @@ Then `fs-types = { version = "~0.0.7", registry = "freesynergy" }`. Keep `Cargo.
 
 ## Rules
 - A bad tag (lightweight, off `main`, semver red, moved) makes every run red and blocks all LATER tags of all source repos. Way out: delete the tag in the source repo, or raise the first version of that line in `allowed-sources.txt` by a reviewed pull request.
-- GitHub switches scheduled workflows off after 60 days without activity. If no release happens for that long: Actions -> index -> `Enable workflow`, then `Run workflow`.
+- GitHub switches scheduled workflows off after 60 days without activity in the repo. No calendar reminder is kept for this. Check after each release that its index line appeared; if it did not, Actions -> index -> `Enable workflow` (if it is off), then `Run workflow`. The automatic blocker in the release flow for a missing index line is not wired in yet.
