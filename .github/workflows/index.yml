@@ -9,7 +9,7 @@
 # - `tool` (contents: read): builds fs-crate-index from the pinned fs-release, WITHOUT checkout of any source repo, WITHOUT cache; outputs its sha256.
 # - `package` (contents: read): runs the tool and builds the crates (foreign build code runs here, no write token here). Uploads only plan.txt and the .crate files.
 # - `enter` (contents: write): takes the tool from `tool`, checks it against the sha256 (red if it differs), enters the plan with a fixed toolchain, pushes.
-# Pin: every `uses:` of fs-release below is pinned BY HAND to the fs-release commit 030f112e9aba346fde3895f8e010a0c5b42482b2 (it contains `crates/fs-crate-index` and `actions/semver-baseline`); change the pin only by a reviewed pull request.
+# Pin: every `uses:` of fs-release below is pinned BY HAND to the fs-release commit d6e6d2e9aff407b1232936d0666d0ec080b4360b (it contains `crates/fs-crate-index` and `actions/semver-baseline`); change the pin only by a reviewed pull request.
 name: index
 on:
   schedule:
@@ -37,12 +37,12 @@ jobs:
       toolchain: ${{ steps.sum.outputs.toolchain }}
     steps:
       # no checkout: nothing of fs-crates or of a source repo is in this job; cache "false": the tool is never built from a cache that a package job could have written
-      - uses: FreeSynergy-Net/fs-release/actions/setup-rust@030f112e9aba346fde3895f8e010a0c5b42482b2
+      - uses: FreeSynergy-Net/fs-release/actions/setup-rust@d6e6d2e9aff407b1232936d0666d0ec080b4360b
         with:
           cache: "false"
       # builds fs-crate-index from the pinned checkout of this action (and fetches the pinned cargo-semver-checks, checked by sha256, not used here)
       - id: tools
-        uses: FreeSynergy-Net/fs-release/actions/semver-baseline@030f112e9aba346fde3895f8e010a0c5b42482b2
+        uses: FreeSynergy-Net/fs-release/actions/semver-baseline@d6e6d2e9aff407b1232936d0666d0ec080b4360b
       - id: sum
         run: |
           set -euo pipefail
@@ -70,7 +70,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       # cache "false": foreign build code runs in this job, so its state must never be saved for a later run
-      - uses: FreeSynergy-Net/fs-release/actions/setup-rust@030f112e9aba346fde3895f8e010a0c5b42482b2
+      - uses: FreeSynergy-Net/fs-release/actions/setup-rust@d6e6d2e9aff407b1232936d0666d0ec080b4360b
         with:
           cache: "false"
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -87,7 +87,7 @@ jobs:
           chmod +x "$RUNNER_TEMP/tool/fs-crate-index"
       # ONE implementation of the semver gate and ONE place of the pinned cargo-semver-checks: the action (with `tool` it only installs cargo-semver-checks, it builds nothing)
       - id: tools
-        uses: FreeSynergy-Net/fs-release/actions/semver-baseline@030f112e9aba346fde3895f8e010a0c5b42482b2
+        uses: FreeSynergy-Net/fs-release/actions/semver-baseline@d6e6d2e9aff407b1232936d0666d0ec080b4360b
         with:
           tool: ${{ runner.temp }}/tool/fs-crate-index
       # reads the allow list, `git ls-remote --tags` of every repo on it, checks (annotated tag, tag commit on main of the source repo, tag = package version,
@@ -123,7 +123,7 @@ jobs:
       contents: write
     steps:
       # the toolchain first and fixed (RUSTUP_TOOLCHAIN in the environment beats a rust-toolchain.toml inside a .crate: `cargo metadata` runs in the unpacked .crate)
-      - uses: FreeSynergy-Net/fs-release/actions/setup-rust@030f112e9aba346fde3895f8e010a0c5b42482b2
+      - uses: FreeSynergy-Net/fs-release/actions/setup-rust@d6e6d2e9aff407b1232936d0666d0ec080b4360b
         with:
           cache: "false"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
